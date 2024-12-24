@@ -13,7 +13,7 @@ from xgboost import plot_importance
 from sklearn.linear_model import Lasso, LinearRegression
 import plotly.express as px
 import joblib
-import models
+# import models
 
 st.set_page_config(
     page_title="Température Terrestre",
