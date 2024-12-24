@@ -1,0 +1,7 @@
+[theme]
+base="dark"
+primaryColor="#1E90FF" # Bleu clair
+backgroundColor="#0B3D91" # Bleu foncé
+secondaryBackgroundColor="#122A5E" # Bleu intermédiaire
+textColor="#EAF6FF" # Blanc-bleuté
+font="sans serif" # police
