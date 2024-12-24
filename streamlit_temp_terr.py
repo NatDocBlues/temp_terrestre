@@ -185,7 +185,22 @@ if page == pages[3] :
                 'Feature': feats.columns,
                 'Importance': model.feature_importances_
             }).sort_values(by='Importance', ascending=False)
-            plot_feature_importance(rf_importances, "Importance des caractéristiques - Random Forest")            
+            plot_feature_importance(rf_importances, "Importance des caractéristiques - Random Forest")
+        
+    st.write('### Simulation')
+    
+    slider_population  = st.slider('Population',0,100,50)
+    slider_co2  = st.slider('CO2',0,100,50)
+    slider_co2_per_capita = st.slider('CO2 per capita',0,100,50)
+    slider_cumulative_co2 = st.slider('Cumulative CO2',0,100,50)
+    slider_co2_per_gdp = st.slider('CO2 per GDP',0,100,50)
+    slider_coal_co2 = st.slider('Coal CO2',0,100,50)
+    slider_flaring_co2 = st.slider('Flaring CO2',0,100,50)
+    slider_gas_co2 = st.slider('Gas CO2',0,100,50)
+    slider_oil_co2 = st.slider('Oil CO2',0,100,50)
+    slider_cement_co2 = st.slider('Cement CO2',0,100,50)
+    slider_land_use_change_co2  = st.slider('Land use change CO2',0,100,50)
+
 
     
 
