@@ -85,6 +85,62 @@ st.sidebar.write('Nicolas BINAUX')
 st.sidebar.write('Guillaume LEBRUN')
 st.sidebar.write('Alexandre MAGGI')
 
+# -------------- PAGE 0 ------------------------------------
+if page == pages[0]:
+    st.write("## Contexte")
+    st.write(
+    """
+    Le réchauffement climatique est un phénomène documenté depuis plus de 50 ans, avec des relevés de températures et des observations scientifiques à l’échelle mondiale.
+    Ses manifestations sont désormais visibles et incontestables : augmentation des vagues de chaleur, fonte accélérée des glaciers, montée du niveau des mers et bouleversements des écosystèmes. 
+    Ces changements, largement attribués aux émissions de gaz à effet de serre issues des activités humaines, soulèvent des enjeux cruciaux pour l’avenir de la planète.
+    """
+)  
+    st.write("### 100% des zones de la planète sont touchées")
+    st.write(
+        """
+        Dans ce contexte, comprendre et anticiper l’évolution des températures est essentiel et nécessite une compréhension approfondie des tendances futures. Les impacts du réchauffement sur les sociétés, les écosystèmes et les économies rendent indispensables des outils capables de modéliser et d’anticiper les évolutions à venir.
+        
+        En s’appuyant sur des données climatiques collectées à l’échelle mondiale, ce travail vise à concevoir un modèle prédictif pour estimer les tendances futures.
+        """
+    )        
+    st.write("## Objectifs")
+    st.markdown(
+    """
+    1. **Comprendre les datasets de données climatiques :**  
+       - Explorer et comprendre les deux datasets.  
+       - Explorer les variables disponibles et évaluer les éventuelles limites des données (valeurs manquantes, complétudes, biais historiques).
+    """
+)
+    st.write("")  # Ajout d'une ligne vide
+    st.markdown(
+    """
+    2. **Analyse exploratoire :**  
+       - Étudier les anomalies de température globale et régionale (évolution des hémisphères Nord/Sud).  
+       - Analyser les tendances des émissions de CO2 (globale, par habitant, par pays).  
+       - Détecter les corrélations entre émissions de CO2 et anomalies climatiques.
+    """
+)
+    st.write("")  # Ajout d'une ligne vide
+    st.markdown(
+    """
+    3. **Nettoyage et pré-processing :**  
+       - Traitement des valeurs manquantes, non pertinentes ou redondantes.  
+       - Fusion éventuelle des datasets.  
+       - Agrégation des données lorsque c’est possible pour simplifier l’analyse globale.  
+       - Création de nouvelles variables si besoin.
+    """
+)
+    st.write("")  # Ajout d'une ligne vide
+    st.markdown(
+    """
+    4. **Modélisation :**  
+       - Test sur plusieurs algorithmes (Régression linéaire, Lasso Regression, Random Forest, XGBoost).  
+       - Évaluation des performances à l’aide de métriques (R², RMSE, MAE) et sélection du modèle.
+    """
+)
+
+
+
 # --------------- PAGE 1 -----------------------------------
 if page == pages[1] : 
   st.write("## Exploration des données")
@@ -98,14 +154,33 @@ if page == pages[1] :
     st.dataframe(Temp_CO2_Glob.isna().sum())
 
 # --------------- PAGE 2 -----------------------------------
-if page == pages[2] : 
-    st.write("## Data Vizualisation")
-    st.write("### Nettoyage & Pre-Processing")
-    # -----
-    st.write("### Evolution des anomalies de temperatures")
-    fig = plt.figure()
-    temperature_data = pd.read_csv("https://data.giss.nasa.gov/gistemp/tabledata_v4/ZonAnn.Ts+dSST.csv")
-    plt.plot(temperature_data["Year"], temperature_data["Glob"], label="Anomalies de température Globale", color="blue")
+if page == pages[2]:
+    st.write("## Data Visualization")
+    
+    # Chargement des données
+    try:
+        temperature_data = pd.read_csv("https://data.giss.nasa.gov/gistemp/tabledata_v4/ZonAnn.Ts+dSST.csv")
+    except Exception as e:
+        st.error(f"Erreur lors du chargement des données : {e}")
+        st.stop()
+
+    # ---- Section : Évolution des anomalies globales ----
+    st.write("### Évolution des anomalies de températures globales")
+    st.write("""
+    Ce graphique montre l'évolution des anomalies de température globale de 1880 à 2023. 
+- **Ce qu’on observe :**
+  - Une relative stabilité jusqu’aux années 1940.
+  - Une augmentation notable à partir des années 1980, avec une accélération dans les années 2000.
+  - Les températures actuelles dépassent souvent une anomalie de +1°C, ce qui est significatif.
+  - Cette tendance reflète l'impact des activités humaines, comme l'industrialisation et l'utilisation de combustibles fossiles.
+    """)
+    fig = plt.figure(figsize=(8, 6))
+    plt.plot(
+        temperature_data["Year"], 
+        temperature_data["Glob"], 
+        label="Anomalies de température Globale", 
+        color="blue"
+    )
     plt.xlabel("Année")
     plt.ylabel("Température (°C)")
     plt.title("Évolution des anomalies de températures globales (1880-2023)")
@@ -113,23 +188,102 @@ if page == pages[2] :
     plt.grid(True)
     st.pyplot(fig)
 
-    fig = plt.figure()
-    st.write("### Evolution des anomalies de temperatures - Hémisphère Nord et Sud")
-    plt.plot(temperature_data["Year"], temperature_data["NHem"], label="Hémisphère Nord", color="red")
-    plt.plot(temperature_data["Year"], temperature_data["SHem"], label="Hémisphère Sud", color="green")
+    # ---- Section : Comparaison des anomalies Nord/Sud ----
+    st.write("### Évolution des anomalies de températures - Hémisphère Nord et Sud")
+    st.write("""
+    Ce graphique compare les anomalies de températures entre l'hémisphère Nord et l'hémisphère Sud.
+- **Ce qu’on observe :**
+  - L’hémisphère Nord (en rouge) montre une augmentation plus rapide des températures par rapport à l’hémisphère Sud (en vert).
+  - L’écart s’élargit surtout après les années 1950, probablement à cause de :
+    - Une concentration plus importante de terres émergées dans l’hémisphère Nord.
+    - Une intensité plus élevée des activités humaines dans cette région.
+  - Ces différences régionales illustrent des impacts variés du changement climatique selon les zones géographiques.
+    """)
+    fig = plt.figure(figsize=(8, 4))
+    plt.plot(
+        temperature_data["Year"], 
+        temperature_data["NHem"], 
+        label="Hémisphère Nord", 
+        color="red"
+    )
+    plt.plot(
+        temperature_data["Year"], 
+        temperature_data["SHem"], 
+        label="Hémisphère Sud", 
+        color="green"
+    )
     plt.xlabel("Année")
     plt.ylabel("Température (°C)")
-    plt.title("Comparaison des anomalies de températures entre l'hémisphère nord et sud (1880-2023)")
+    plt.title("Comparaison des anomalies de températures entre l'hémisphère Nord et Sud (1880-2023)")
     plt.legend()
     plt.grid(True)
     st.pyplot(fig)
 
-    fig = plt.figure()
-    st.write("### DIstribution des anomalies de temperature global")
-    sns.boxplot(x = temperature_data['Glob'])
+    # ---- Section : Distribution des anomalies ----
+    st.write("### Distribution des anomalies de température globale")
+    st.write("""
+    Ce boxplot montre la distribution des anomalies de températures globales sur toute la période d'analyse.
+- **Ce qu’on observe :**
+  - La médiane (ligne au centre de la boîte) est proche de 0, reflétant une relative stabilité pendant une grande partie de la période.
+  - Une asymétrie apparaît vers des valeurs positives, montrant un réchauffement global dans les années récentes.
+  - Les points aberrants (outliers) représentent des années exceptionnelles où les anomalies étaient particulièrement élevées.
+    """)
+    fig = plt.figure(figsize=(6, 4))
+    sns.boxplot(x=temperature_data['Glob'], color="blue")
+    plt.title("Distribution des anomalies de températures globales")
+    plt.xlabel("Température (°C)")
     st.pyplot(fig)
 
+    # ---- Matrice de corrélation ----
+    st.write("### Matrice de corrélation")
+    st.write("""
+    Cette matrice de corrélation montre les relations entre les différentes variables climatiques et socio-économiques. 
+    Les corrélations mesurent la force et la direction de la relation entre deux variables :
+        - **1.0** : Corrélation positive parfaite.
+        - **-1.0** : Corrélation négative parfaite.
+        - **0.0** : Aucune corrélation.
 
+    ### Observations principales :
+    1. Les **émissions de CO2 totales** montrent une forte corrélation positive avec :
+        - Les anomalies de température globale (**0.94**).
+        - Les anomalies de température des hémisphères Nord (**0.93**) et Sud (**0.95**).
+     - Cela indique que l'augmentation des émissions de CO2 est directement liée au réchauffement global.
+
+    2. La **population totale** est fortement corrélée avec les émissions de CO2 (**1.0**) :
+        - Plus la population est importante, plus les émissions de CO2 augmentent en raison des besoins en énergie et des activités industrielles.
+
+    3. Les émissions liées à différentes sources d'énergie (gaz, pétrole, charbon) sont fortement corrélées entre elles :
+        - Par exemple, **CO2 lié au charbon** et **CO2 lié au pétrole** ont une corrélation de **0.99**, reflétant l'utilisation simultanée de ces sources d'énergie fossile.
+
+    4. Les **anomalies de température globale** présentent une forte corrélation avec :
+        - Les émissions de CO2 totales (**0.94**).
+        - Les anomalies de température dans les hémisphères Nord (**0.98**) et Sud (**0.95**), ce qui montre un effet global mais plus prononcé dans l’hémisphère Nord en raison de l’intensité des activités humaines.
+
+    5. Le **CO2 lié au changement d’affectation des terres** a une faible corrélation avec les anomalies de température (**-0.37 à -0.41**) :
+        - Cela peut s'expliquer par la complexité des interactions entre la déforestation et les émissions directes ou indirectes.
+
+    Ces observations soulignent l'importance de la réduction des émissions de CO2 pour limiter les anomalies climatiques à l'échelle mondiale.
+    """)
+
+    # Calcul de la matrice de corrélation pour les colonnes numériques uniquement
+    numeric_data = Temp_CO2_Glob.select_dtypes(include=['float64', 'int64'])
+    numeric_data = numeric_data.fillna(0)  # Remplacement des valeurs manquantes par 0
+    correlation_matrix = numeric_data.corr()
+
+    # Visualisation de la matrice de corrélation avec Seaborn
+    fig = plt.figure(figsize=(12, 10))
+    sns.heatmap(
+        correlation_matrix,
+        annot=True,                # Affiche les valeurs dans les cellules
+        fmt=".2f",                 # Format des valeurs avec deux décimales
+        cmap="coolwarm",           # Palette de couleurs
+        linewidths=0.5,            # Ajoute des séparateurs entre les cellules
+        cbar_kws={"shrink": 0.8}   # Ajuste la taille de la barre de couleurs
+    )
+    plt.title("Matrice de corrélation des variables climatiques et socio-économiques", fontsize=16, pad=20)
+    plt.xticks(fontsize=12, rotation=45, ha='right')  # Rotation et alignement des étiquettes sur l'axe x
+    plt.yticks(fontsize=12)                           # Taille des étiquettes sur l'axe y
+    st.pyplot(fig)
 
 # --------------- PAGE 3 -----------------------------------
 if page == pages[3] :
@@ -201,6 +355,256 @@ if page == pages[3] :
     slider_cement_co2 = st.slider('Cement CO2',0,100,50)
     slider_land_use_change_co2  = st.slider('Land use change CO2',0,100,50)
 
+# ------------------ PAGE : CONCLUSION -------------------
+if page == pages[4]:
+    st.write("## Conclusion")
 
+    st.write("### Difficultés rencontrées")
+    st.write(
+        """
+        - **Valeurs manquantes**  
+          Les lacunes dans les données historiques (notamment avant 1900) ont nécessité des imputation et un ajustement rigoureux pour minimiser l’impact sur les analyses.
+          Les données avant 1900 ont été exclues grâce à un filtrage explicite pour éviter d’incorporer des données incomplètes.
+              
+        - **Disparités régionales**  
+          Les variations régionales importantes (entre continents et pays) ont complexifié l’interprétation des tendances globales.
+          Les émissions de CO2 ont été regroupées par continent pour une analyse simplifiée.
+          Les anomalies de température ont été comparées entre l’hémisphère Nord et Sud.
+
+        
+        - **Modélisation complexe**  
+          L’ajustement des hyperparamètres pour certains modèles (notamment XGBoost et Random Forest) a demandé des itérations longues.  
+          Des risques d’overfitting ont été identifiés pour certains modèles avancés, bien que des validations croisées aient permis de les atténuer.
+        
+        """
+    )
+    st.write("### Réponses aux objectifs")
+
+    st.write(
+        """
+       1. **Comprendre les datasets de données climatiques :**  
+       - Les datasets de la NASA (anomalies de température) et de Global Change Data Lab (émissions de CO2) ont été analysés, intégrés et fusionnés efficacement.  
+       - Les variables clés ont été identifiées et enrichies, et les limites des données (valeurs manquantes, biais historiques) ont été prises en compte.
+       """
+    )
+    st.write("")  # Ajout d'une ligne vide
+
+    st.write(
+        """
+    2. **Analyse exploratoire :**  
+       - Les tendances des anomalies de température globale et régionale ont été mises en évidence, montrant une accélération depuis les années 1950.
+       - Les disparités régionales (hémisphères Nord/Sud, continents) et les contributions des principaux pays émetteurs de CO2 (Chine, USA, Inde) ont été analysées.
+       - Les corrélations fortes (≈ 0,95) entre émissions de CO2 et anomalies climatiques ont été confirmées.
+       """
+    )
+    st.write("")  
+
+    st.write(
+        """
+    3. **Nettoyage et pré-processing :**  
+       - Les données ont été nettoyées avec succès, fusionnées sur une clé commune (année) et enrichies avec de nouvelles variables (variation annuelle des émissions, décalage temporel).
+       - L’agrégation par continent a simplifié l’analyse tout en préservant les grandes tendances régionales.
+       """
+    )
+    st.write("")  
+
+    st.write(
+        """
+    4. **Modélisation :**  
+       - Plusieurs algorithmes ont été testés (Régression linéaire, Lasso, Random Forest, XGBoost).
+       - Le modèle Lasso Regression a été sélectionné comme le plus performant grâce à un R² proche de 1 et une interprétabilité claire, confirmant son aptitude à prédire les anomalies de température.
+       """
+    )
+    st.write("")  
+
+    st.write(
+        """
+    5. **Synthèse et visualisation :**  
+       - Les résultats ont été présentés sous forme de visualisations pertinentes (évolution des températures, émissions de CO2, importance des variables).
+       - Ces graphiques ont facilité la communication des conclusions et des implications pour le futur.
+       """
+    )
+
+    st.write("### Résultats compilés :")
+    results_data = {
+        "Modèle": ["Régression Linéaire", "Lasso Regression", "XGBoost", "Random Forest"],
+        "R² (Train)": [0.944, 0.934, 0.999, 0.999],
+        "R² (Test)": [0.871, 0.829, 0.896, 0.887],
+        "MSE (Test)": [0.0157, 0.0207, 0.0126, 0.0136],
+        "RMSE (Test)": [0.125, 0.144, 0.112, 0.117],
+        "MAE (Test)": [0.105, 0.122, 0.095, 0.099]
+    }
+    results_df = pd.DataFrame(results_data)
+
+    # Créer un DataFrame fondu pour permettre l'animation
+    df_melted = results_df.melt(id_vars="Modèle", var_name="Métrique", value_name="Valeur")
+
+    # Définir une plage dynamique maximale pour chaque métrique
+    range_dict = {
+        "R² (Train)": [0, 1.5],
+        "R² (Test)": [0, 1.5],
+        "MSE (Test)": [0, df_melted[df_melted["Métrique"] == "MSE (Test)"]["Valeur"].max() * 1.2],
+        "RMSE": [0, df_melted[df_melted["Métrique"] == "RMSE"]["Valeur"].max() * 1.2],
+        "MAE": [0, df_melted[df_melted["Métrique"] == "MAE"]["Valeur"].max() * 1.2],
+    }
+
+    # Créer le graphique animé avec des plages spécifiques pour chaque métrique
+    fig = px.bar(
+        df_melted,
+        x="Modèle",
+        y="Valeur",
+        color="Modèle",
+        animation_frame="Métrique",
+        title="Évolution des performances par métrique",
+        labels={"Valeur": "Valeur", "Modèle": "Modèle", "Métrique": "Métrique"},
+    )
+
+    # Ajouter des plages dynamiques pour chaque métrique
+    fig.update_layout(
+        yaxis=dict(range=[0, max(range_dict.values(), key=lambda x: x[1])[1]])
+    )
+
+    # Afficher les valeurs sur les barres
+    fig.update_traces(texttemplate="%{y:.3f}", textposition="outside")
+
+    # Afficher le graphique dans Streamlit
+    st.plotly_chart(fig)
+
+# Affiche le tableau avec ajustement pour toute la largeur
+    st.dataframe(results_df, use_container_width=True)
+    # st.dataframe(results_df, use_container_width=True)
+
+    # Ajouter un texte explicatif
+    st.write("### Analyse des performances des modèles")
+
+    # Données
+    results_data = {
+        "Modèle": ["Régression Linéaire", "Lasso", "XGBoost", "Random Forest"],
+        "R² (Train)": [0.944, 0.934, 0.999, 0.999],
+        "R² (Test)": [0.871, 0.829, 0.896, 0.887],
+        "MSE (Test)": [0.0157, 0.0207, 0.0126, 0.0136],
+        "RMSE": [0.125, 0.144, 0.112, 0.117],
+        "MAE": [0.105, 0.122, 0.095, 0.099],
+    }
+    results_df = pd.DataFrame(results_data)
+
+    # Transformation en format long
+    results_melted = results_df.melt(id_vars="Modèle", var_name="Métrique", value_name="Valeur")
+
+    if page == "Conclusion":
+    
+    # Calcul des rangs (inversion pour les métriques où une valeur plus basse est meilleure)
+        results_ranked = results_df.copy()
+        for metric in ["MSE (Test)", "RMSE", "MAE"]:
+            results_ranked[metric] = results_df[metric].rank(ascending=True)  # Plus bas est mieux
+        for metric in ["R² (Train)", "R² (Test)"]:
+            results_ranked[metric] = results_df[metric].rank(ascending=False)  # Plus haut est mieux
+
+        # Transposition pour préparer les heatmaps
+        values_heatmap = results_df.set_index("Modèle").T
+        ranked_heatmap = results_ranked.set_index("Modèle").T
+
+        # Création des colonnes pour deux graphiques côte à côte
+        col1, col2 = st.columns(2)
+
+        # Heatmap avec les valeurs réelles
+        with col1:
+            st.write("### Heatmap des valeurs réelles")
+            fig_values = px.imshow(
+                values_heatmap,
+                labels={"x": "Modèle", "y": "Métrique", "color": "Valeur"},
+                title="Valeurs des indicateurs",
+                text_auto=True,  # Affiche les valeurs
+                color_continuous_scale="Blues",  # Palette de couleurs
+                width=500,
+                height=500
+            )
+            fig_values.update_layout(margin=dict(l=30, r=30, t=50, b=30), font=dict(size=14))
+            st.plotly_chart(fig_values)
+
+        # Heatmap avec les rangs
+        with col2:
+            st.write("### Heatmap des classements")
+            fig_ranks = px.imshow(
+                ranked_heatmap,
+                labels={"x": "Modèle", "y": "Métrique", "color": "Rang"},
+                title="Classement des modèles",
+                text_auto=True,  # Affiche les rangs
+                color_continuous_scale="Greens",  # Palette différente pour les rangs
+                width=500,
+                height=500
+            )
+            fig_ranks.update_layout(margin=dict(l=30, r=30, t=50, b=30), font=dict(size=14))
+            st.plotly_chart(fig_ranks)
     
 
+    st.write("""
+    Ce graphique permet de visualiser les performances des différents modèles selon plusieurs indicateurs :
+    - **R² (Train/Test)** : Mesure la capacité des modèles à expliquer la variance des données sur les ensembles d'entraînement et de test.
+    - **MSE (Test)** : Moyenne des erreurs quadratiques des prédictions, plus elle est basse, mieux c'est.
+    - **RMSE** : Racine de l'erreur quadratique moyenne, utile pour interpréter les erreurs dans l'unité d'origine.
+    - **MAE** : Moyenne des erreurs absolues, représentant l'écart moyen des prédictions par rapport aux valeurs réelles.
+
+    Les modèles ayant une aire plus étendue indiquent une meilleure performance globale. Par exemple :
+    - **XGBoost** se distingue par une précision élevée sur les jeux de test.
+    - **Régression Linéaire** montre une bonne généralisation mais des limites pour les erreurs (MAE et RMSE).
+    """)
+
+    st.write("## Conclusion générale")
+    st.write("### Modèle sélectionné : XGBoost")
+    st.write(
+    """
+    Après analyse, le modèle **XGBoost** a été sélectionné comme le meilleur modèle pour prédire les anomalies de température. Voici pourquoi :
+    """
+    )
+
+    # **1. Performances supérieures**
+    st.write("#### 1. Performances supérieures")
+    st.write(
+    """
+    - XGBoost obtient les meilleurs scores parmi les modèles testés :  
+      - **R² sur les données de test : 0.896**  
+        Explique près de **90 %** de la variance des anomalies de température.  
+      - **RMSE : 0.112**  
+        Montre une faible erreur quadratique moyenne des prédictions.  
+      - **MAE : 0.095**  
+        Indique une erreur absolue moyenne très faible.  
+
+    - Comparé aux autres modèles :
+      - Régression Linéaire : R² = 0.871, RMSE = 0.125, MAE = 0.105.  
+      - Lasso Regression : R² = 0.829, RMSE = 0.144, MAE = 0.122.  
+      - Random Forest : R² = 0.887, RMSE = 0.117, MAE = 0.099.  
+      
+    Ces résultats confirment que XGBoost est le modèle le plus précis et fiable.
+    """
+)
+
+    # **2. Adaptabilité aux données complexes**
+    st.write("#### 2. Adaptabilité aux données complexes")
+    st.write(
+    """
+    - XGBoost capture mieux les relations complexes et non linéaires entre les variables (émissions de CO2, population, etc.) :  
+      - Avec un **R² de 0.896** sur les données de test, il surpasse largement les modèles linéaires.  
+      - Les interactions entre les émissions par habitant, la population et d'autres variables sont bien modélisées.  
+      
+    Cela lui permet de mieux expliquer les tendances que des modèles simples comme la Régression Linéaire (R² = 0.871).
+    """
+    )
+
+    # **3. Robustesse face à l'overfitting**
+    st.write("#### 3. Robustesse face à l'overfitting")
+    st.write(
+    """
+    - XGBoost utilise une régularisation intégrée qui réduit le risque d'overfitting :  
+      - **R² sur les données d'entraînement : 0.999**  
+        Montre un ajustement quasi parfait.  
+      - **R² sur les données de test : 0.896**  
+        La faible différence entre ces scores montre une excellente capacité de généralisation.  
+
+    - En comparaison :
+      - Random Forest, bien qu'efficace, montre un R² légèrement inférieur sur les données de test (0.887).  
+      - Les modèles linéaires, bien qu'ils généralisent mieux, ont des performances globales inférieures.  
+
+    XGBoost offre ainsi un bon équilibre entre précision et robustesse.
+    """
+    )
