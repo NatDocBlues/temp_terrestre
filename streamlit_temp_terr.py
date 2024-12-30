@@ -426,116 +426,75 @@ if page == pages[4]:
     )
 
     st.write("### Résultats compilés :")
-    results_data = {
-        "Modèle": ["Régression Linéaire", "Lasso Regression", "XGBoost", "Random Forest"],
-        "R² (Train)": [0.944, 0.934, 0.999, 0.999],
-        "R² (Test)": [0.871, 0.829, 0.896, 0.887],
-        "MSE (Test)": [0.0157, 0.0207, 0.0126, 0.0136],
-        "RMSE (Test)": [0.125, 0.144, 0.112, 0.117],
-        "MAE (Test)": [0.105, 0.122, 0.095, 0.099]
-    }
+
+    results_data = []
+    for model_name in ["Regression Linéaire", "Lasso", "XGBoost", "Random Forest"]:
+        try:
+            # Charger chaque modèle sauvegardé
+            model = joblib.load(f"{model_name}.joblib")
+            y_pred = model.predict(X_test_scaled)
+ 
+           # Collecter les métriques pour chaque modèle
+            results_data.append({
+                "Modèle": model_name,
+                "R² (Train)": model.score(X_train_scaled, y_train),
+                "R² (Test)": model.score(X_test_scaled, y_test),
+                "MSE (Test)": mean_squared_error(y_test, y_pred),
+                "RMSE (Test)": root_mean_squared_error(y_test, y_pred),
+                "MAE (Test)": mean_absolute_error(y_test, y_pred)
+            })
+        except Exception as e:
+          st.error(f"Erreur avec le modèle {model_name} : {e}")
+ 
+    # Créer un DataFrame pour afficher les résultats
     results_df = pd.DataFrame(results_data)
-
-    # Créer un DataFrame fondu pour permettre l'animation
-    df_melted = results_df.melt(id_vars="Modèle", var_name="Métrique", value_name="Valeur")
-
-    # Définir une plage dynamique maximale pour chaque métrique
-    range_dict = {
-        "R² (Train)": [0, 1.5],
-        "R² (Test)": [0, 1.5],
-        "MSE (Test)": [0, df_melted[df_melted["Métrique"] == "MSE (Test)"]["Valeur"].max() * 1.2],
-        "RMSE": [0, df_melted[df_melted["Métrique"] == "RMSE"]["Valeur"].max() * 1.2],
-        "MAE": [0, df_melted[df_melted["Métrique"] == "MAE"]["Valeur"].max() * 1.2],
-    }
-
-    # Créer le graphique animé avec des plages spécifiques pour chaque métrique
-    fig = px.bar(
-        df_melted,
-        x="Modèle",
-        y="Valeur",
-        color="Modèle",
-        animation_frame="Métrique",
-        title="Évolution des performances par métrique",
-        labels={"Valeur": "Valeur", "Modèle": "Modèle", "Métrique": "Métrique"},
-    )
-
-    # Ajouter des plages dynamiques pour chaque métrique
-    fig.update_layout(
-        yaxis=dict(range=[0, max(range_dict.values(), key=lambda x: x[1])[1]])
-    )
-
-    # Afficher les valeurs sur les barres
-    fig.update_traces(texttemplate="%{y:.3f}", textposition="outside")
-
-    # Afficher le graphique dans Streamlit
-    st.plotly_chart(fig)
-
-# Affiche le tableau avec ajustement pour toute la largeur
+ 
+    # Afficher les résultats sous forme de tableau
     st.dataframe(results_df, use_container_width=True)
-    # st.dataframe(results_df, use_container_width=True)
 
-    # Ajouter un texte explicatif
-    st.write("### Analyse des performances des modèles")
-
-    # Données
-    results_data = {
-        "Modèle": ["Régression Linéaire", "Lasso", "XGBoost", "Random Forest"],
-        "R² (Train)": [0.944, 0.934, 0.999, 0.999],
-        "R² (Test)": [0.871, 0.829, 0.896, 0.887],
-        "MSE (Test)": [0.0157, 0.0207, 0.0126, 0.0136],
-        "RMSE": [0.125, 0.144, 0.112, 0.117],
-        "MAE": [0.105, 0.122, 0.095, 0.099],
-    }
-    results_df = pd.DataFrame(results_data)
-
-    # Transformation en format long
-    results_melted = results_df.melt(id_vars="Modèle", var_name="Métrique", value_name="Valeur")
-
-    if page == "Conclusion":
-    
+    # Créer les heatmaps à partir des résultats
+    st.write("### Heatmap des résultats")
+ 
     # Calcul des rangs (inversion pour les métriques où une valeur plus basse est meilleure)
-        results_ranked = results_df.copy()
-        for metric in ["MSE (Test)", "RMSE", "MAE"]:
-            results_ranked[metric] = results_df[metric].rank(ascending=True)  # Plus bas est mieux
-        for metric in ["R² (Train)", "R² (Test)"]:
-            results_ranked[metric] = results_df[metric].rank(ascending=False)  # Plus haut est mieux
+    results_ranked = results_df.copy()
+    for metric in ["MSE (Test)", "RMSE (Test)", "MAE (Test)"]:
+        results_ranked[metric] = results_df[metric].rank(ascending=True)  # Plus bas est mieux
+    for metric in ["R² (Train)", "R² (Test)"]:
+        results_ranked[metric] = results_df[metric].rank(ascending=False)  # Plus haut est mieux
+ 
+    # Transposer pour les heatmaps
+    values_heatmap = results_df.set_index("Modèle").T
+    ranked_heatmap = results_ranked.set_index("Modèle").T
+ 
+    # Afficher les deux heatmaps côte à côte
+    col1, col2 = st.columns(2)
 
-        # Transposition pour préparer les heatmaps
-        values_heatmap = results_df.set_index("Modèle").T
-        ranked_heatmap = results_ranked.set_index("Modèle").T
+    with col1:
+        st.write("#### Valeurs réelles")
+        fig_values = px.imshow(
+            values_heatmap,
+            labels={"x": "Modèle", "y": "Métrique", "color": "Valeur"},
+            title="Heatmap des valeurs réelles",
+            text_auto=True,
+            color_continuous_scale="Blues",
+            width=500,
+            height=500
+        )
+        st.plotly_chart(fig_values)
+ 
+    with col2:
+        st.write("#### Classements")
+        fig_ranks = px.imshow(
+            ranked_heatmap,
+            labels={"x": "Modèle", "y": "Métrique", "color": "Classement"},
+            title="Heatmap des classements",
+            text_auto=True,
+            color_continuous_scale="Greens",
+            width=500,
+            height=500
+        )
+        st.plotly_chart(fig_ranks)
 
-        # Création des colonnes pour deux graphiques côte à côte
-        col1, col2 = st.columns(2)
-
-        # Heatmap avec les valeurs réelles
-        with col1:
-            st.write("### Heatmap des valeurs réelles")
-            fig_values = px.imshow(
-                values_heatmap,
-                labels={"x": "Modèle", "y": "Métrique", "color": "Valeur"},
-                title="Valeurs des indicateurs",
-                text_auto=True,  # Affiche les valeurs
-                color_continuous_scale="Blues",  # Palette de couleurs
-                width=500,
-                height=500
-            )
-            fig_values.update_layout(margin=dict(l=30, r=30, t=50, b=30), font=dict(size=14))
-            st.plotly_chart(fig_values)
-
-        # Heatmap avec les rangs
-        with col2:
-            st.write("### Heatmap des classements")
-            fig_ranks = px.imshow(
-                ranked_heatmap,
-                labels={"x": "Modèle", "y": "Métrique", "color": "Rang"},
-                title="Classement des modèles",
-                text_auto=True,  # Affiche les rangs
-                color_continuous_scale="Greens",  # Palette différente pour les rangs
-                width=500,
-                height=500
-            )
-            fig_ranks.update_layout(margin=dict(l=30, r=30, t=50, b=30), font=dict(size=14))
-            st.plotly_chart(fig_ranks)
     
 
     st.write("""
