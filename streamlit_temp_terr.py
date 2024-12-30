@@ -61,7 +61,7 @@ Temp_CO2_Glob = Temp_CO2_Glob.rename(columns={
     'gas_co2' : 'CO2 lié au gaz',
     'oil_co2' : 'CO2 lié au pétrol',
     'cement_co2' : 'CO2 lié au ciment',
-    'land_use_change_co2' : 'CO2 lié au changement d"affectation des terres'})
+    'land_use_change_co2' : "CO2 lié au changement d'affectation des terres"})
 # ---------------------------------------------------------
 
 # --------------- JEU D'ENTRAINEEMNT ----------------------
@@ -608,3 +608,81 @@ if page == pages[4]:
     XGBoost offre ainsi un bon équilibre entre précision et robustesse.
     """
     )
+
+    # ------------------- CHARGEMENT DU MODÈLE XGBOOST ET SCÉNARIOS -------------------
+    # Charger le modèle XGBoost
+    model = joblib.load("XGBOOST.joblib")
+
+    # Colonnes des features pour le modèle
+    feature_columns = [
+        "Population totale",
+        "Émissions de CO2 (Mt)",
+        "Émissions de CO2 par Habitant (t/hab)",
+        "CO2 Cumulé (Mt)",
+        "CO2 par PIB",
+        "CO2 lié au charbon",
+        "CO2 lié au torchage",
+        "CO2 lié au gaz",
+        "CO2 lié au pétrol",
+        "CO2 lié au ciment",
+        "CO2 lié au changement d'affectation des terres",
+    ]
+
+    # Scénarios hypothétiques
+    scenarios = {
+        "Scénario actuel": {
+            "Population totale": X_train["Population totale"].mean(),
+            "Émissions de CO2 (Mt)": X_train["Émissions de CO2 (Mt)"].mean(),
+            "Émissions de CO2 par Habitant (t/hab)": X_train["Émissions de CO2 par Habitant (t/hab)"].mean(),
+            "CO2 Cumulé (Mt)": X_train["CO2 Cumulé (Mt)"].mean(),
+            "CO2 par PIB": X_train["CO2 par PIB"].mean(),
+            "CO2 lié au charbon": X_train["CO2 lié au charbon"].mean(),
+            "CO2 lié au torchage": X_train["CO2 lié au torchage"].mean(),
+            "CO2 lié au gaz": X_train["CO2 lié au gaz"].mean(),
+            "CO2 lié au pétrol": X_train["CO2 lié au pétrol"].mean(),
+            "CO2 lié au ciment": X_train["CO2 lié au ciment"].mean(),
+            "CO2 lié au changement d'affectation des terres": X_train["CO2 lié au changement d'affectation des terres"].mean(),
+        },
+        "Population double, CO₂ divisé par 2": {
+            "Population totale": X_train["Population totale"].mean() * 2,
+            "Émissions de CO2 (Mt)": X_train["Émissions de CO2 (Mt)"].mean() / 2,
+            "Émissions de CO2 par Habitant (t/hab)": X_train["Émissions de CO2 par Habitant (t/hab)"].mean() / 2,
+            "CO2 Cumulé (Mt)": X_train["CO2 Cumulé (Mt)"].mean(),
+            "CO2 par PIB": X_train["CO2 par PIB"].mean(),
+            "CO2 lié au charbon": X_train["CO2 lié au charbon"].mean(),
+            "CO2 lié au torchage": X_train["CO2 lié au torchage"].mean(),
+            "CO2 lié au gaz": X_train["CO2 lié au gaz"].mean(),
+            "CO2 lié au pétrol": X_train["CO2 lié au pétrol"].mean(),
+            "CO2 lié au ciment": X_train["CO2 lié au ciment"].mean(),
+            "CO2 lié au changement d'affectation des terres": X_train["CO2 lié au changement d'affectation des terres"].mean(),
+        },
+        "Réduction massive des émissions": {
+            "Population totale": X_train["Population totale"].mean(),
+            "Émissions de CO2 (Mt)": X_train["Émissions de CO2 (Mt)"].mean() * 0.2,
+            "Émissions de CO2 par Habitant (t/hab)": X_train["Émissions de CO2 par Habitant (t/hab)"].mean(),
+            "CO2 Cumulé (Mt)": X_train["CO2 Cumulé (Mt)"].mean(),
+            "CO2 par PIB": X_train["CO2 par PIB"].mean(),
+            "CO2 lié au charbon": X_train["CO2 lié au charbon"].mean(),
+            "CO2 lié au torchage": X_train["CO2 lié au torchage"].mean(),
+            "CO2 lié au gaz": X_train["CO2 lié au gaz"].mean(),
+            "CO2 lié au pétrol": X_train["CO2 lié au pétrol"].mean(),
+            "CO2 lié au ciment": X_train["CO2 lié au ciment"].mean(),
+            "CO2 lié au changement d'affectation des terres": X_train["CO2 lié au changement d'affectation des terres"].mean(),
+        },
+    }
+
+    # Afficher les scénarios dans une liste déroulante
+    scenario_choice = st.selectbox("Choisissez un scénario", list(scenarios.keys()))
+    scenario_data = pd.DataFrame([scenarios[scenario_choice]])
+
+    # Afficher les données du scénario
+    st.write(f"### Données du scénario : {scenario_choice}")
+    st.dataframe(scenario_data)
+
+    # Appliquer le scaling sur les données du scénario
+    try:
+        scenario_data_scaled = scaler.transform(scenario_data)
+        predicted_anomaly = model.predict(scenario_data_scaled)
+        st.write(f"🌍 **Anomalie prédite :** {predicted_anomaly[0]:.2f} °C")
+    except Exception as e:
+        st.error(f"Erreur : {e}")
