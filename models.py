@@ -61,7 +61,6 @@ def plot_feature_importance(feature_importance, title):
     fig.update_layout(yaxis_title="Caractéristiques", xaxis_title="Importance", title_x=0.5)
     fig.show()
 
-# MODELE 1 : XGBoost
 feats = Temp_CO2_Glob.drop(['Anomalie Température Globale (°C)', 'Anomalie Température Hémisphère Nord (°C)',
                             'Anomalie Température Hémisphère Sud (°C)'], axis=1)
 target = Temp_CO2_Glob['Anomalie Température Globale (°C)']
@@ -71,6 +70,7 @@ scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 
+# MODELE 1 : XGBoost
 xgb_params = {
     'eta': [0.1, 0.3, 0.5],
     'max_depth': [3, 6, 9],

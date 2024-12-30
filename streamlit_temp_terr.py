@@ -293,7 +293,7 @@ if page == pages[3] :
     st.write('### Le modèle choisi est :', option)
 
     model = joblib.load(f"{option}.joblib")
-    model.fit(X_train_scaled, y_train)
+    # model.fit(X_train_scaled, y_train)
     y_pred = model.predict(X_test_scaled)
 
     rmse = root_mean_squared_error(y_test, y_pred)
@@ -304,7 +304,7 @@ if page == pages[3] :
     st.write("R2 jeu d'entrainement:", model.score(X_train_scaled, y_train))
     st.write("R2 jeu de test:", model.score(X_test_scaled, y_test))    
     st.write('RMSE:', rmse)
-    st.write('R2', r2)
+    # st.write('R2', r2)
     st.write('MSE', mse)
     st.write('MAE', mae)
     
