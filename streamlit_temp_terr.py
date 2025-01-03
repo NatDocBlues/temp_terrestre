@@ -422,16 +422,56 @@ if page == pages[4]:
     )
     st.write("")  
 
-    st.write(
-        """
-    5. **Synthèse et visualisation :**  
-       - Les résultats ont été présentés sous forme de visualisations pertinentes (évolution des températures, émissions de CO2, importance des variables).
-       - Ces graphiques ont facilité la communication des conclusions et des implications pour le futur.
-       """
-    )
-
     st.write("### Résultats compilés :")
-
+    results_data = {
+        "Modèle": ["Régression Linéaire", "Lasso Regression", "XGBoost", "Random Forest"],
+        "R² (Train)": [0.944, 0.934, 0.999, 0.999],
+        "R² (Test)": [0.871, 0.829, 0.896, 0.887],
+        "MSE (Test)": [0.0157, 0.0207, 0.0126, 0.0136],
+        "RMSE (Test)": [0.125, 0.144, 0.112, 0.117],
+        "MAE (Test)": [0.105, 0.122, 0.095, 0.099]
+    }
+    results_df = pd.DataFrame(results_data)
+ 
+    # Créer un DataFrame fondu pour permettre l'animation
+    df_melted = results_df.melt(id_vars="Modèle", var_name="Métrique", value_name="Valeur")
+ 
+    # Définir une plage dynamique maximale pour chaque métrique
+    range_dict = {
+        "R² (Train)": [0, 1.5],
+        "R² (Test)": [0, 1.5],
+        "MSE (Test)": [0, df_melted[df_melted["Métrique"] == "MSE (Test)"]["Valeur"].max() * 1.2],
+        "RMSE": [0, df_melted[df_melted["Métrique"] == "RMSE"]["Valeur"].max() * 1.2],
+        "MAE": [0, df_melted[df_melted["Métrique"] == "MAE"]["Valeur"].max() * 1.2],
+    }
+ 
+    # Créer le graphique animé avec des plages spécifiques pour chaque métrique
+    fig = px.bar(
+        df_melted,
+        x="Modèle",
+        y="Valeur",
+        color="Modèle",
+        animation_frame="Métrique",
+        title="Évolution des performances par métrique",
+        labels={"Valeur": "Valeur", "Modèle": "Modèle", "Métrique": "Métrique"},
+    )
+ 
+    # Ajouter des plages dynamiques pour chaque métrique
+    fig.update_layout(
+        yaxis=dict(range=[0, max(range_dict.values(), key=lambda x: x[1])[1]])
+    )
+ 
+    # Afficher les valeurs sur les barres
+    fig.update_traces(texttemplate="%{y:.3f}", textposition="outside")
+ 
+    # Afficher le graphique dans Streamlit
+    st.plotly_chart(fig)
+ 
+    # Ajouter un texte explicatif
+    st.write("### Analyse des performances des modèles")
+  
+    # Transformation en format long
+    results_melted = results_df.melt(id_vars="Modèle", var_name="Métrique", value_name="Valeur")        
     results_data = []
     for model_name in ["Regression Linéaire", "Lasso", "XGBOOST", "Random Forest"]:
         try:
