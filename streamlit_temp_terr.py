@@ -342,18 +342,23 @@ if page == pages[3] :
             plot_feature_importance(rf_importances, "Importance des caractéristiques - Random Forest")
         
     st.write('### Simulation')
+
+    col1a, col2a = st.columns(2)
+    with col1a:
+        slider_population  = st.slider('Population',0,100,50)
+        slider_co2  = st.slider('CO2',0,100,50)
+        slider_co2_per_capita = st.slider('CO2 per capita',0,100,50)
+        slider_cumulative_co2 = st.slider('Cumulative CO2',0,100,50)
+        slider_co2_per_gdp = st.slider('CO2 per GDP',0,100,50)
+        slider_coal_co2 = st.slider('Coal CO2',0,100,50)
     
-    slider_population  = st.slider('Population',0,100,50)
-    slider_co2  = st.slider('CO2',0,100,50)
-    slider_co2_per_capita = st.slider('CO2 per capita',0,100,50)
-    slider_cumulative_co2 = st.slider('Cumulative CO2',0,100,50)
-    slider_co2_per_gdp = st.slider('CO2 per GDP',0,100,50)
-    slider_coal_co2 = st.slider('Coal CO2',0,100,50)
-    slider_flaring_co2 = st.slider('Flaring CO2',0,100,50)
-    slider_gas_co2 = st.slider('Gas CO2',0,100,50)
-    slider_oil_co2 = st.slider('Oil CO2',0,100,50)
-    slider_cement_co2 = st.slider('Cement CO2',0,100,50)
-    slider_land_use_change_co2  = st.slider('Land use change CO2',0,100,50)
+    with col2a:
+        slider_flaring_co2 = st.slider('Flaring CO2',0,100,50)
+        slider_gas_co2 = st.slider('Gas CO2',0,100,50)
+        slider_oil_co2 = st.slider('Oil CO2',0,100,50)
+        slider_cement_co2 = st.slider('Cement CO2',0,100,50)
+        slider_land_use_change_co2  = st.slider('Land use change CO2',0,100,50)
+    
 
 # ------------------ PAGE : CONCLUSION -------------------
 if page == pages[4]:
@@ -569,76 +574,115 @@ if page == pages[4]:
     )
 
     # ------------------- CHARGEMENT DU MODÈLE XGBOOST ET SCÉNARIOS -------------------
-    # Charger le modèle XGBoost
+# Charger le modèle XGBoost
     model = joblib.load("XGBOOST.joblib")
-
-    # Colonnes des features pour le modèle
-    feature_columns = [
-        "Population totale",
-        "Émissions de CO2 (Mt)",
-        "Émissions de CO2 par Habitant (t/hab)",
-        "CO2 Cumulé (Mt)",
-        "CO2 par PIB",
-        "CO2 lié au charbon",
-        "CO2 lié au torchage",
-        "CO2 lié au gaz",
-        "CO2 lié au pétrol",
-        "CO2 lié au ciment",
-        "CO2 lié au changement d'affectation des terres",
-    ]
-
-    # Scénarios hypothétiques
+ 
+    st.write("## Prédictions avec le modèle XGBoost")
+ 
+# Scénarios
     scenarios = {
-        "Scénario actuel": {
-            "Population totale": X_train["Population totale"].mean(),
-            "Émissions de CO2 (Mt)": X_train["Émissions de CO2 (Mt)"].mean(),
-            "Émissions de CO2 par Habitant (t/hab)": X_train["Émissions de CO2 par Habitant (t/hab)"].mean(),
-            "CO2 Cumulé (Mt)": X_train["CO2 Cumulé (Mt)"].mean(),
-            "CO2 par PIB": X_train["CO2 par PIB"].mean(),
-            "CO2 lié au charbon": X_train["CO2 lié au charbon"].mean(),
-            "CO2 lié au torchage": X_train["CO2 lié au torchage"].mean(),
-            "CO2 lié au gaz": X_train["CO2 lié au gaz"].mean(),
-            "CO2 lié au pétrol": X_train["CO2 lié au pétrol"].mean(),
-            "CO2 lié au ciment": X_train["CO2 lié au ciment"].mean(),
-            "CO2 lié au changement d'affectation des terres": X_train["CO2 lié au changement d'affectation des terres"].mean(),
-        },
-        "Population double, CO₂ divisé par 2": {
-            "Population totale": X_train["Population totale"].mean() * 2,
-            "Émissions de CO2 (Mt)": X_train["Émissions de CO2 (Mt)"].mean() / 2,
-            "Émissions de CO2 par Habitant (t/hab)": X_train["Émissions de CO2 par Habitant (t/hab)"].mean() / 2,
-            "CO2 Cumulé (Mt)": X_train["CO2 Cumulé (Mt)"].mean(),
-            "CO2 par PIB": X_train["CO2 par PIB"].mean(),
-            "CO2 lié au charbon": X_train["CO2 lié au charbon"].mean(),
-            "CO2 lié au torchage": X_train["CO2 lié au torchage"].mean(),
-            "CO2 lié au gaz": X_train["CO2 lié au gaz"].mean(),
-            "CO2 lié au pétrol": X_train["CO2 lié au pétrol"].mean(),
-            "CO2 lié au ciment": X_train["CO2 lié au ciment"].mean(),
-            "CO2 lié au changement d'affectation des terres": X_train["CO2 lié au changement d'affectation des terres"].mean(),
-        },
-        "Réduction massive des émissions": {
-            "Population totale": X_train["Population totale"].mean(),
-            "Émissions de CO2 (Mt)": X_train["Émissions de CO2 (Mt)"].mean() * 0.2,
-            "Émissions de CO2 par Habitant (t/hab)": X_train["Émissions de CO2 par Habitant (t/hab)"].mean(),
-            "CO2 Cumulé (Mt)": X_train["CO2 Cumulé (Mt)"].mean(),
-            "CO2 par PIB": X_train["CO2 par PIB"].mean(),
-            "CO2 lié au charbon": X_train["CO2 lié au charbon"].mean(),
-            "CO2 lié au torchage": X_train["CO2 lié au torchage"].mean(),
-            "CO2 lié au gaz": X_train["CO2 lié au gaz"].mean(),
-            "CO2 lié au pétrol": X_train["CO2 lié au pétrol"].mean(),
-            "CO2 lié au ciment": X_train["CO2 lié au ciment"].mean(),
-            "CO2 lié au changement d'affectation des terres": X_train["CO2 lié au changement d'affectation des terres"].mean(),
-        },
+    "Scénario actuel": {
+        "Population totale": X_test["Population totale"].max(),
+        "Émissions de CO2 (Mt)": X_test["Émissions de CO2 (Mt)"].max(),
+        "Émissions de CO2 par Habitant (t/hab)": X_test["Émissions de CO2 par Habitant (t/hab)"].max(),
+        "CO2 Cumulé (Mt)": X_test["CO2 Cumulé (Mt)"].max(),
+        "CO2 par PIB": X_test["CO2 par PIB"].max(),
+        "CO2 lié au charbon": X_test["CO2 lié au charbon"].max(),
+        "CO2 lié au torchage": X_test["CO2 lié au torchage"].max(),
+        "CO2 lié au gaz": X_test["CO2 lié au gaz"].max(),
+        "CO2 lié au pétrol": X_test["CO2 lié au pétrol"].max(),
+        "CO2 lié au ciment": X_test["CO2 lié au ciment"].max(),
+        "CO2 lié au changement d'affectation des terres": X_test["CO2 lié au changement d'affectation des terres"].max()
+    },
+    "Population double, CO₂ divisé par 2": {
+        "Population totale": X_test["Population totale"].max() * 2,
+        "Émissions de CO2 (Mt)": X_test["Émissions de CO2 (Mt)"].max() / 2,
+        "Émissions de CO2 par Habitant (t/hab)": X_test["Émissions de CO2 par Habitant (t/hab)"].max() / 2,
+        "CO2 Cumulé (Mt)": X_test["CO2 Cumulé (Mt)"].max() / 2,
+        "CO2 par PIB": X_test["CO2 par PIB"].max() / 2,
+        "CO2 lié au charbon": X_test["CO2 lié au charbon"].max() / 2,
+        "CO2 lié au torchage": X_test["CO2 lié au torchage"].max() / 2,
+        "CO2 lié au gaz": X_test["CO2 lié au gaz"].max() / 2,
+        "CO2 lié au pétrol": X_test["CO2 lié au pétrol"].max() / 2,
+        "CO2 lié au ciment": X_test["CO2 lié au ciment"].max() / 2,
+        "CO2 lié au changement d'affectation des terres": X_test["CO2 lié au changement d'affectation des terres"].max() / 2
+    },
+    "Réduction massive des émissions": {
+        "Population totale": X_test["Population totale"].max(),
+        "Émissions de CO2 (Mt)": X_test["Émissions de CO2 (Mt)"].max() * 0.2,
+        "Émissions de CO2 par Habitant (t/hab)": X_test["Émissions de CO2 par Habitant (t/hab)"].max() * 0.2,
+        "CO2 Cumulé (Mt)": X_test["CO2 Cumulé (Mt)"].max() * 0.2,
+        "CO2 par PIB": X_test["CO2 par PIB"].max() * 0.2,
+        "CO2 lié au charbon": X_test["CO2 lié au charbon"].max() * 0.2,
+        "CO2 lié au torchage": X_test["CO2 lié au torchage"].max() * 0.2,
+        "CO2 lié au gaz": X_test["CO2 lié au gaz"].max() * 0.2,
+        "CO2 lié au pétrol": X_test["CO2 lié au pétrol"].max() * 0.2,
+        "CO2 lié au ciment": X_test["CO2 lié au ciment"].max() * 0.2,
+        "CO2 lié au changement d'affectation des terres": X_test["CO2 lié au changement d'affectation des terres"].max() * 0.2
+    },
+    "Augmentation des énergies fossiles": {
+        "Population totale": X_test["Population totale"].max(),
+        "Émissions de CO2 (Mt)": X_test["Émissions de CO2 (Mt)"].max() * 1.5,
+        "Émissions de CO2 par Habitant (t/hab)": X_test["Émissions de CO2 par Habitant (t/hab)"].max() * 1.5,
+        "CO2 Cumulé (Mt)": X_test["CO2 Cumulé (Mt)"].max() * 1.5,
+        "CO2 par PIB": X_test["CO2 par PIB"].max() * 1.5,        
+        "CO2 lié au charbon": X_test["CO2 lié au charbon"].max() * 1.5,
+        "CO2 lié au torchage": X_test["CO2 lié au torchage"].max() * 1.5,    
+        "CO2 lié au gaz": X_test["CO2 lié au gaz"].max() * 1.5,            
+        "CO2 lié au pétrol": X_test["CO2 lié au pétrol"].max() * 1.5,
+        "CO2 lié au ciment": X_test["CO2 lié au ciment"].max() * 1.5,
+        "CO2 lié au changement d'affectation des terres": X_test["CO2 lié au changement d'affectation des terres"].max() * 1.5
+    },
+    "Transition vers les énergies renouvelables": {
+        "Population totale": X_test["Population totale"].max(),
+        "Émissions de CO2 (Mt)": X_test["Émissions de CO2 (Mt)"].max() * 0.1,
+        "Émissions de CO2 par Habitant (t/hab)": X_test["Émissions de CO2 par Habitant (t/hab)"].max() * 0.1,
+        "CO2 Cumulé (Mt)": X_test["CO2 Cumulé (Mt)"].max() * 0.1,
+        "CO2 par PIB": X_test["CO2 par PIB"].max() * 0.1,        
+        "CO2 lié au charbon": X_test["CO2 lié au charbon"].max() * 0.1,
+        "CO2 lié au torchage": X_test["CO2 lié au torchage"].max() * 0.1,          
+        "CO2 lié au gaz": X_test["CO2 lié au gaz"].max() * 0.1,
+        "CO2 lié au pétrol": X_test["CO2 lié au pétrol"].max() * 0.1,
+        "CO2 lié au ciment": X_test["CO2 lié au ciment"].max() * 0.1,
+        "CO2 lié au changement d'affectation des terres": X_test["CO2 lié au changement d'affectation des terres"].max() * 0.1
+    },
+    "Croissance démographique rapide": {
+        "Population totale": X_test["Population totale"].max() * 3,
+        "Émissions de CO2 (Mt)": X_test["Émissions de CO2 (Mt)"].max(),
+        "Émissions de CO2 par Habitant (t/hab)": X_test["Émissions de CO2 par Habitant (t/hab)"].max(),
+        "CO2 Cumulé (Mt)": X_test["CO2 Cumulé (Mt)"].max(),
+        "CO2 par PIB": X_test["CO2 par PIB"].max(),        
+        "CO2 lié au charbon": X_test["CO2 lié au charbon"].max(),
+        "CO2 lié au torchage": X_test["CO2 lié au torchage"].max(),          
+        "CO2 lié au gaz": X_test["CO2 lié au gaz"].max(),
+        "CO2 lié au pétrol": X_test["CO2 lié au pétrol"].max(),
+        "CO2 lié au ciment": X_test["CO2 lié au ciment"].max(),
+        "CO2 lié au changement d'affectation des terres": X_test["CO2 lié au changement d'affectation des terres"].max()      
+    },
+    "Scénario optimiste : réduction globale des émissions": {
+        "Population totale": X_test["Population totale"].max(),
+        "Émissions de CO2 (Mt)": X_test["Émissions de CO2 (Mt)"].max() * 0.3,
+        "Émissions de CO2 par Habitant (t/hab)": X_test["Émissions de CO2 par Habitant (t/hab)"].max() * 0.3,
+        "CO2 Cumulé (Mt)": X_test["CO2 Cumulé (Mt)"].max() * 0.3,
+        "CO2 par PIB": X_test["CO2 par PIB"].max() * 0.3,            
+        "CO2 lié au charbon": X_test["CO2 lié au charbon"].max() * 0.3,
+        "CO2 lié au torchage": X_test["CO2 lié au torchage"].max() * 0.3,          
+        "CO2 lié au gaz": X_test["CO2 lié au gaz"].max() * 0.3,
+        "CO2 lié au pétrol": X_test["CO2 lié au pétrol"].max() * 0.3,
+        "CO2 lié au ciment": X_test["CO2 lié au ciment"].max() * 0.3,
+        "CO2 lié au changement d'affectation des terres": X_test["CO2 lié au changement d'affectation des terres"].max() * 0.3  
     }
-
-    # Afficher les scénarios dans une liste déroulante
+    }
+ 
+# Afficher les scénarios dans une liste déroulante
     scenario_choice = st.selectbox("Choisissez un scénario", list(scenarios.keys()))
     scenario_data = pd.DataFrame([scenarios[scenario_choice]])
-
-    # Afficher les données du scénario
+ 
+# Afficher les données du scénario
     st.write(f"### Données du scénario : {scenario_choice}")
     st.dataframe(scenario_data)
-
-    # Appliquer le scaling sur les données du scénario
+ 
+# Appliquer le scaling sur les données du scénario
     try:
         scenario_data_scaled = scaler.transform(scenario_data)
         predicted_anomaly = model.predict(scenario_data_scaled)
