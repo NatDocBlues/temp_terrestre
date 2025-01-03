@@ -433,7 +433,7 @@ if page == pages[4]:
     st.write("### Résultats compilés :")
 
     results_data = []
-    for model_name in ["Regression Linéaire", "Lasso", "XGBoost", "Random Forest"]:
+    for model_name in ["Regression Linéaire", "Lasso", "XGBOOST", "Random Forest"]:
         try:
             # Charger chaque modèle sauvegardé
             model = joblib.load(f"{model_name}.joblib")
