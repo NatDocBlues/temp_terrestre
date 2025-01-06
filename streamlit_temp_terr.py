@@ -360,20 +360,23 @@ if page == pages[3] :
                 'Feature': feats.columns,
                 'Importance': model.coef_
             }).sort_values(by='Importance', ascending=False)
-            plot_feature_importance(lasso_importances, "Importance des caractéristiques - Lasso Regression")       
+            st.write("Le modèle Lasso est efficace pour sélectionner les variables les plus influentes grâce à la régularisation. Avec un R2 de 0.829 et un MSE de 0.021, il permet de limiter la représentation de valeurs redondantes ou peu influentes, et limite les risques de surajustement")
+            plot_feature_importance(lasso_importances, "Importance des caractéristiques - Lasso Regression")
         
         case "XGBOOST":
             xgb_importances = pd.DataFrame({
                 'Feature': feats.columns,
                 'Importance': model.feature_importances_
             }).sort_values(by='Importance', ascending=False)
-            plot_feature_importance(xgb_importances, "Importance des caractéristiques - XGBoost")        
+            st.write("XGBoost est un modèle puissant qui excelle dans la gestion des relations complexes. Avec un R2 de 0.907 sur le jeu de test et un RMSE de 0.106, il montre une grande capacité à prédire les valeurs cibles. Il a cependant fallu une configuration minutieuse de ses hyperparamètres pour obtenir ces performances.")        
+            plot_feature_importance(xgb_importances, "Importance des caractéristiques - XGBoost")
 
         case "Regression Linéaire":
             linear_importances = pd.DataFrame({
                 'Feature': feats.columns,
                 'Importance': model.coef_
             }).sort_values(by='Importance', ascending=False)
+            st.write("La régression linéaire démontre une capacité correcte à modéliser les relations entre les variables explicatives et la cible, avec un R2 de 0.871 sur le jeu de test. Elle parvient également à expliquer une part significative de la variance, mais les métriques d'erreur, comme le RMSE (0.125) et le MSE(0.016), indiquent des marges d'erreur notables, et donc une précision trop juste du modèle.")       
             plot_feature_importance(linear_importances, "Importance des caractéristiques - Régression Linéaire")
             
         case "Random Forest":
@@ -381,8 +384,8 @@ if page == pages[3] :
                 'Feature': feats.columns,
                 'Importance': model.feature_importances_
             }).sort_values(by='Importance', ascending=False)
+            st.write("Avec un R2 de 0.887 et un RMSE de 0.117, le modèle Random Forest montre une bonne capacité à généraliser correctement. La faible différence entre les résultats d'entraînement et de test en atteste. Ce modèle est particulièrement adapté pour capturer des tendances globales et fournir des prédictions fiables.")
             plot_feature_importance(rf_importances, "Importance des caractéristiques - Random Forest")
-
 
 
 # ------------------ PAGE : CONCLUSION -------------------
