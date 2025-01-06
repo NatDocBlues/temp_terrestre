@@ -156,7 +156,7 @@ if page == pages[1] :
 # --------------- PAGE 2 -----------------------------------
 if page == pages[2]:
     st.write("## Data Visualization")
-    
+  
     # Chargement des données
     try:
         temperature_data = pd.read_csv("https://data.giss.nasa.gov/gistemp/tabledata_v4/ZonAnn.Ts+dSST.csv")
@@ -165,10 +165,10 @@ if page == pages[2]:
         st.stop()
 
     # ---- Section : Évolution des anomalies globales ----
-    st.write("### Évolution des anomalies de températures globales")
+    st.write("### 1. Évolution des anomalies de températures globales")
     st.write("""
-    Ce graphique montre l'évolution des anomalies de température globale de 1880 à 2023. 
-- **Ce qu’on observe :**
+    Ce graphique montre l'évolution des anomalies de température globale de 1880 à 2023.
+    ##### Observations principales :
   - Une relative stabilité jusqu’aux années 1940.
   - Une augmentation notable à partir des années 1980, avec une accélération dans les années 2000.
   - Les températures actuelles dépassent souvent une anomalie de +1°C, ce qui est significatif.
@@ -176,9 +176,9 @@ if page == pages[2]:
     """)
     fig = plt.figure(figsize=(8, 6))
     plt.plot(
-        temperature_data["Year"], 
-        temperature_data["Glob"], 
-        label="Anomalies de température Globale", 
+        temperature_data["Year"],
+        temperature_data["Glob"],
+        label="Anomalies de température Globale",
         color="blue"
     )
     plt.xlabel("Année")
@@ -187,12 +187,12 @@ if page == pages[2]:
     plt.legend()
     plt.grid(True)
     st.pyplot(fig)
-
+    st.write("--------------------")
     # ---- Section : Comparaison des anomalies Nord/Sud ----
-    st.write("### Évolution des anomalies de températures - Hémisphère Nord et Sud")
+    st.write("### 2. Évolution des anomalies de températures - Hémisphère Nord et Sud")
     st.write("""
     Ce graphique compare les anomalies de températures entre l'hémisphère Nord et l'hémisphère Sud.
-- **Ce qu’on observe :**
+    ##### Observations principales :
   - L’hémisphère Nord (en rouge) montre une augmentation plus rapide des températures par rapport à l’hémisphère Sud (en vert).
   - L’écart s’élargit surtout après les années 1950, probablement à cause de :
     - Une concentration plus importante de terres émergées dans l’hémisphère Nord.
@@ -201,15 +201,15 @@ if page == pages[2]:
     """)
     fig = plt.figure(figsize=(8, 4))
     plt.plot(
-        temperature_data["Year"], 
-        temperature_data["NHem"], 
-        label="Hémisphère Nord", 
+        temperature_data["Year"],
+        temperature_data["NHem"],
+        label="Hémisphère Nord",
         color="red"
     )
     plt.plot(
-        temperature_data["Year"], 
-        temperature_data["SHem"], 
-        label="Hémisphère Sud", 
+        temperature_data["Year"],
+        temperature_data["SHem"],
+        label="Hémisphère Sud",
         color="green"
     )
     plt.xlabel("Année")
@@ -218,59 +218,100 @@ if page == pages[2]:
     plt.legend()
     plt.grid(True)
     st.pyplot(fig)
-
+    st.write("--------------------")
     # ---- Section : Distribution des anomalies ----
-    st.write("### Distribution des anomalies de température globale")
+    st.write("### 3. Distribution des anomalies de température globale")
     st.write("""
     Ce boxplot montre la distribution des anomalies de températures globales sur toute la période d'analyse.
-- **Ce qu’on observe :**
-  - La médiane (ligne au centre de la boîte) est proche de 0, reflétant une relative stabilité pendant une grande partie de la période.
-  - Une asymétrie apparaît vers des valeurs positives, montrant un réchauffement global dans les années récentes.
-  - Les points aberrants (outliers) représentent des années exceptionnelles où les anomalies étaient particulièrement élevées.
+    ##### Observations principales :
+    - La médiane (ligne au centre de la boîte) est proche de 0, reflétant une relative stabilité pendant une grande partie de la période.
+    - Une asymétrie apparaît vers des valeurs positives, montrant un réchauffement global dans les années récentes.
+    - Les points aberrants (outliers) représentent des années exceptionnelles où les anomalies étaient particulièrement élevées.
     """)
     fig = plt.figure(figsize=(6, 4))
     sns.boxplot(x=temperature_data['Glob'], color="blue")
     plt.title("Distribution des anomalies de températures globales")
     plt.xlabel("Température (°C)")
     st.pyplot(fig)
-
-    # ---- Matrice de corrélation ----
-    st.write("### Matrice de corrélation")
+    st.write("--------------------")
+    # ---- Section : Comparaison des anomalies Nord/Sud ----
+    st.write("### 4. Évolution des émissions de CO2 par habitant pour des pays sélectionnés")
     st.write("""
-    Cette matrice de corrélation montre les relations entre les différentes variables climatiques et socio-économiques. 
+    Ce graphique illustre les tendances des émissions de CO2 par habitant (en tonnes) pour plusieurs pays au fil des années. Voici les principaux points d'analyse :
+    ##### Observations principales :
+    1. **États-Unis (en bleu)** :
+        - Les États-Unis ont historiquement les émissions par habitant les plus élevées, avec un pic autour de 20 tonnes par habitant dans les années 1970.
+        - Depuis, une tendance à la baisse est observée, grâce à des politiques de transition énergétique et à une meilleure efficacité énergétique.
+    2. **Chine (en orange)** :
+        - La Chine montre une croissance marquée des émissions par habitant à partir des années 1990, reflétant une industrialisation rapide.
+        - Les émissions par habitant restent inférieures à celles des États-Unis, mais la tendance est croissante.
+    3. **Inde (en vert)** :
+        - L'Inde affiche des émissions par habitant très faibles, même avec sa forte croissance économique.
+        - Cela souligne les disparités dans les contributions au CO2 entre les pays industrialisés et en développement.
+    4. **Russie (en rouge)** :
+        - Les émissions par habitant de la Russie connaissent une forte baisse après la chute de l'Union soviétique dans les années 1990, mais elles se stabilisent ensuite.
+    5. **Brésil (en violet)** :
+        - Le Brésil a des émissions modérées et relativement stables par habitant, probablement en raison d'une utilisation plus importante des énergies renouvelables comme l'hydroélectricité.
+    6. **France (en marron)** :
+        - La France montre une baisse constante des émissions par habitant grâce à sa transition vers le nucléaire et les énergies renouvelables.
+    """)
+    # Filtrage des données pour les pays spécifiques
+    countries = ["United States", "China", "India", "Russia", "Brazil", "France"]
+    country_data = CO2_evol[CO2_evol["country"].isin(countries)]
+    # Gestion des données manquantes
+    country_data = country_data.dropna(subset=["year", "co2_per_capita"])
+    # Initialisation de la figure avec plt.subplots()
+    fig, ax = plt.subplots(figsize=(14, 7))
+    # Tracé des courbes pour chaque pays
+    for country in countries:
+        country_subset = country_data[country_data["country"] == country]
+        ax.plot(
+            country_subset["year"],
+            country_subset["co2_per_capita"],
+            label=country
+        )
+    # Ajout des labels, titre, et légende
+    ax.set_xlabel("Année")
+    ax.set_ylabel("Émissions de CO2 par habitant (tonnes)")
+    ax.set_title("Évolution des émissions de CO2 par habitant pour des pays sélectionnés")
+    ax.legend()
+    ax.grid(True)
+    # Affichage du graphique dans Streamlit
+    st.pyplot(fig)
+    st.write("""
+    - Ce graphique met en évidence des disparités majeures entre les pays industrialisés et les pays émergents.
+    - Les pays développés comme les États-Unis et la France ont amorcé une réduction de leurs émissions, tandis que les pays émergents comme la Chine et l'Inde augmentent leurs émissions en raison de la croissance industrielle.
+    - Ces tendances illustrent les défis mondiaux pour atteindre les objectifs climatiques, notamment une transition équitable vers des économies à faible émission de carbone.
+    """)
+    st.write("--------------------")
+    # ---- Matrice de corrélation ----
+    st.write("### 5. Matrice de corrélation")
+    st.write("""
+    Cette matrice de corrélation montre les relations entre les différentes variables climatiques et socio-économiques.
     Les corrélations mesurent la force et la direction de la relation entre deux variables :
         - **1.0** : Corrélation positive parfaite.
         - **-1.0** : Corrélation négative parfaite.
         - **0.0** : Aucune corrélation.
-
-    ### Observations principales :
+    ##### Observations principales :
     1. Les **émissions de CO2 totales** montrent une forte corrélation positive avec :
         - Les anomalies de température globale (**0.94**).
         - Les anomalies de température des hémisphères Nord (**0.93**) et Sud (**0.95**).
      - Cela indique que l'augmentation des émissions de CO2 est directement liée au réchauffement global.
-
     2. La **population totale** est fortement corrélée avec les émissions de CO2 (**1.0**) :
         - Plus la population est importante, plus les émissions de CO2 augmentent en raison des besoins en énergie et des activités industrielles.
-
     3. Les émissions liées à différentes sources d'énergie (gaz, pétrole, charbon) sont fortement corrélées entre elles :
         - Par exemple, **CO2 lié au charbon** et **CO2 lié au pétrole** ont une corrélation de **0.99**, reflétant l'utilisation simultanée de ces sources d'énergie fossile.
-
     4. Les **anomalies de température globale** présentent une forte corrélation avec :
         - Les émissions de CO2 totales (**0.94**).
         - Les anomalies de température dans les hémisphères Nord (**0.98**) et Sud (**0.95**), ce qui montre un effet global mais plus prononcé dans l’hémisphère Nord en raison de l’intensité des activités humaines.
-
     5. Le **CO2 lié au changement d’affectation des terres** a une faible corrélation avec les anomalies de température (**-0.37 à -0.41**) :
         - Cela peut s'expliquer par la complexité des interactions entre la déforestation et les émissions directes ou indirectes.
-
     Ces observations soulignent l'importance de la réduction des émissions de CO2 pour limiter les anomalies climatiques à l'échelle mondiale.
     """)
-
     # Calcul de la matrice de corrélation pour les colonnes numériques uniquement
     numeric_data = Temp_CO2_Glob.select_dtypes(include=['float64', 'int64'])
     numeric_data = numeric_data.fillna(0)  # Remplacement des valeurs manquantes par 0
-    correlation_matrix = numeric_data.corr()
-
-    # Visualisation de la matrice de corrélation avec Seaborn
+    correlation_matrix = numeric_data.corr()    # Visualisation de la matrice de corrélation avec Seaborn
     fig = plt.figure(figsize=(12, 10))
     sns.heatmap(
         correlation_matrix,
@@ -281,9 +322,10 @@ if page == pages[2]:
         cbar_kws={"shrink": 0.8}   # Ajuste la taille de la barre de couleurs
     )
     plt.title("Matrice de corrélation des variables climatiques et socio-économiques", fontsize=16, pad=20)
-    plt.xticks(fontsize=12, rotation=45, ha='right')  # Rotation et alignement des étiquettes sur l'axe x
+    plt.xticks(fontsize=12, rotation=45, ha='right')  # Rotation etalignement des étiquettes sur l'axe x
     plt.yticks(fontsize=12)                           # Taille des étiquettes sur l'axe y
     st.pyplot(fig)
+    st.write("--------------------")
 
 # --------------- PAGE 3 -----------------------------------
 if page == pages[3] :
