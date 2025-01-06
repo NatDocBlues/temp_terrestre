@@ -465,14 +465,26 @@ if page == pages[4]:
     st.write("")  
 
     st.write("### Résultats compilés :")
-    results_data = {
-        "Modèle": ["Régression Linéaire", "Lasso Regression", "XGBoost", "Random Forest"],
-        "R² (Train)": [0.944, 0.934, 0.999, 0.999],
-        "R² (Test)": [0.871, 0.829, 0.896, 0.887],
-        "MSE (Test)": [0.0157, 0.0207, 0.0126, 0.0136],
-        "RMSE (Test)": [0.125, 0.144, 0.112, 0.117],
-        "MAE (Test)": [0.105, 0.122, 0.095, 0.099]
-    }
+    results_data = []
+    for model_name in ["Regression Linéaire", "Lasso", "XGBOOST", "Random Forest"]:
+        try:
+            # Charger chaque modèle sauvegardé
+            model = joblib.load(f"{model_name}.joblib")
+            y_pred = model.predict(X_test_scaled)
+ 
+           # Collecter les métriques pour chaque modèle
+            results_data.append({
+                "Modèle": model_name,
+                "R² (Train)": model.score(X_train_scaled, y_train),
+                "R² (Test)": model.score(X_test_scaled, y_test),
+                "MSE (Test)": mean_squared_error(y_test, y_pred),
+                "RMSE (Test)": root_mean_squared_error(y_test, y_pred),
+                "MAE (Test)": mean_absolute_error(y_test, y_pred)
+            })
+        except Exception as e:
+          st.error(f"Erreur avec le modèle {model_name} : {e}")
+ 
+    # Créer un DataFrame pour afficher les résultats
     results_df = pd.DataFrame(results_data)
  
     # Créer un DataFrame fondu pour permettre l'animation
@@ -514,27 +526,6 @@ if page == pages[4]:
   
     # Transformation en format long
     results_melted = results_df.melt(id_vars="Modèle", var_name="Métrique", value_name="Valeur")        
-    results_data = []
-    for model_name in ["Regression Linéaire", "Lasso", "XGBOOST", "Random Forest"]:
-        try:
-            # Charger chaque modèle sauvegardé
-            model = joblib.load(f"{model_name}.joblib")
-            y_pred = model.predict(X_test_scaled)
- 
-           # Collecter les métriques pour chaque modèle
-            results_data.append({
-                "Modèle": model_name,
-                "R² (Train)": model.score(X_train_scaled, y_train),
-                "R² (Test)": model.score(X_test_scaled, y_test),
-                "MSE (Test)": mean_squared_error(y_test, y_pred),
-                "RMSE (Test)": root_mean_squared_error(y_test, y_pred),
-                "MAE (Test)": mean_absolute_error(y_test, y_pred)
-            })
-        except Exception as e:
-          st.error(f"Erreur avec le modèle {model_name} : {e}")
- 
-    # Créer un DataFrame pour afficher les résultats
-    results_df = pd.DataFrame(results_data)
  
     # Afficher les résultats sous forme de tableau
     st.dataframe(results_df, use_container_width=True)
