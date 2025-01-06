@@ -632,6 +632,7 @@ if page == pages[4]:
     model = joblib.load("XGBOOST.joblib")
  
     st.write("## Prédictions avec le modèle XGBoost")
+    st.write('(prédiction à partir des valeurs maximales du jeu de test)')
  
 # Scénarios
     scenarios = {
