@@ -600,17 +600,12 @@ if page == pages[4]:
     st.write(
     """
     - XGBoost obtient les meilleurs scores parmi les modèles testés :  
-      - **R² sur les données de test : 0.896**  
+      - **R² sur les données de test : 0.907**  
         Explique près de **90 %** de la variance des anomalies de température.  
-      - **RMSE : 0.112**  
+      - **RMSE : 0.106**  
         Montre une faible erreur quadratique moyenne des prédictions.  
-      - **MAE : 0.095**  
+      - **MAE : 0.088**  
         Indique une erreur absolue moyenne très faible.  
-
-    - Comparé aux autres modèles :
-      - Régression Linéaire : R² = 0.871, RMSE = 0.125, MAE = 0.105.  
-      - Lasso Regression : R² = 0.829, RMSE = 0.144, MAE = 0.122.  
-      - Random Forest : R² = 0.887, RMSE = 0.117, MAE = 0.099.  
       
     Ces résultats confirment que XGBoost est le modèle le plus précis et fiable.
     """
@@ -621,7 +616,7 @@ if page == pages[4]:
     st.write(
     """
     - XGBoost capture mieux les relations complexes et non linéaires entre les variables (émissions de CO2, population, etc.) :  
-      - Avec un **R² de 0.896** sur les données de test, il surpasse largement les modèles linéaires.  
+      - Avec un **R² de 0.907** sur les données de test, il surpasse largement les modèles linéaires.  
       - Les interactions entre les émissions par habitant, la population et d'autres variables sont bien modélisées.  
       
     Cela lui permet de mieux expliquer les tendances que des modèles simples comme la Régression Linéaire (R² = 0.871).
@@ -635,7 +630,7 @@ if page == pages[4]:
     - XGBoost utilise une régularisation intégrée qui réduit le risque d'overfitting :  
       - **R² sur les données d'entraînement : 0.999**  
         Montre un ajustement quasi parfait.  
-      - **R² sur les données de test : 0.896**  
+      - **R² sur les données de test : 0.907**  
         La faible différence entre ces scores montre une excellente capacité de généralisation.  
 
     - En comparaison :
